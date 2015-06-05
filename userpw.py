@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from time import time,ctime #导入模块
+import base64#导入加密模块
 db = {}
 
 def newuser():
@@ -12,36 +13,55 @@ def newuser():
             continue
         else:
             break
-    pwd = raw_input('passwd: ')#用户名合格后，要求输入密码
-    logt=time()#获取时间戳
-    db[name]=[pwd,logt]#把密码和时间组成列表存到字典，共享一个键
+    p1 = raw_input('passwd: ')#明文密码
+    logt=time()
+    p2 = base64.encodestring(p1)#密文密码
+    db[name]=[p2,logt]#存储密文密码
 
 def olduser(): 
     name=raw_input('login: ') 
-    pwd=raw_input('passwd: ')
-    if name in db:#检测是否是老用户
-        if pwd == db.get(name)[0]: #获取老用户密码与输入密码比较
-            print 'welcome back',name #显示欢迎信息
+    p1=raw_input('passwd: ')
+    if name in db:
+        p2=base64.decodestring(db[name][0])#解密所存密文
+        if p1 == p2 : #与用户输入密码比对
+            print 'welcome back',name 
             print 'You lasttime logged in at:',ctime(db[name][1])
-            #显示上次登录的时间戳
-            current=time()#获取当前时间
-            delta=current-db[name][1]#求上次登录与现在时间的时间差
+            current=time()
+            delta=current-db[name][1]
             if delta<=14400: #判断是否在4小时内
                 print 'You already logged in 4 hours period!'
 
-            else:#若时间差不在四小时之内
+            else:
                 logt=time()#获取当前时间 
-                db[name][1]=logt #把密码和时间组成列表存到字典，共享一个键，更新时间戳
-        else: #密码错误
+                db[name][1]=logt #把密码和时间组成列表存到字典，共享一个键
+        else: 
             print 'login incorrect'  
 
-    else: #不是老用户
-        print 'login incorrect'  
+    else: 
+        print 'login incorrect'
 
-def showmenu():
+
+def deluser():
+    Getuserpwd()
+    c=raw_input('del a user,its name:')
+    if c in db.keys():
+        del db[c]
+        print 'After del:'
+        Getuserpwd()
+    else:
+        print 'Wrong choose!'
+
+def Getuserpwd():
+    if db:    
+        for name in db:
+            print 'name:',name,'pwd:',db[name][0]
+    else:
+        print 'No user!'
+
+def management():    
     prompt = """
-(N)ew User Login
-(E)xisting User Login
+(D)el a user
+(G)et all user and pwd
 (Q)uit
 
 Enter choice: """
@@ -56,7 +76,36 @@ Enter choice: """
                 choice = 'q'
             print '\nYou picked: [%s]' % choice
 
-            if choice not in 'neq':
+            if choice not in 'gdq':
+                print 'invalid menu option, try again'
+            else:
+                chosen = True
+
+        if choice == 'q': done = 1
+        if choice == 'd': deluser()
+        if choice == 'g': Getuserpwd()
+
+
+def showmenu():
+    prompt = """
+(N)ew User Login
+(E)xisting User Login
+(M)anagement
+(Q)uit
+
+Enter choice: """
+
+    done = False
+    while not done:
+        chosen = False
+        while not chosen:
+            try:
+                choice = raw_input(prompt).strip()[0].lower()
+            except (EOFError, KeyboardInterrupt):
+                choice = 'q'
+            print '\nYou picked: [%s]' % choice
+
+            if choice not in 'neqm':
                 print 'invalid menu option, try again'
             else:
                 chosen = True
@@ -64,6 +113,7 @@ Enter choice: """
         if choice == 'q': done = 1
         if choice == 'n': newuser()
         if choice == 'e': olduser()
+        if choice == 'm': management()
 
 if __name__ == '__main__':
     showmenu()
