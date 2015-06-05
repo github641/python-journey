@@ -2,24 +2,29 @@
 
 from time import time,ctime #导入模块
 import base64
+import string #导入string模块
 db = {}
+y=string.letters+string.digits#限定只能是数字和大小写字母
 
 def newuser():
-    prompt = 'login desired: '
+    prompt = 'login desired,only accept digits and letters: '
     while True:
-        name = raw_input(prompt).strip()[0].lower()#设定小写
-        if db.has_key(name):
-            prompt = 'name taken, try another: '
-            continue
+        name = raw_input(prompt).strip()[0].lower()
+        if name in y:#验证
+            if db.has_key(name):
+                prompt = 'name taken, try another: '
+                continue
+            else:
+                break
         else:
-            break
+            print 'Invalid name!'
     p1 = raw_input('passwd: ')
     logt=time()
     p2 = base64.encodestring(p1)
     db[name]=[p2,logt]
 
 def olduser(): 
-    name=raw_input('login: ').strip()[0].lower()#设定小写
+    name=raw_input('login: ').strip()[0].lower()
     p1=raw_input('passwd: ')
     if name in db:
         p2=base64.decodestring(db[name][0])
@@ -43,7 +48,7 @@ def olduser():
 
 def deluser():
     Getuserpwd()
-    c=raw_input('del a user,its name:').strip()[0].lower()#设定小写
+    c=raw_input('del a user,its name:').strip()[0].lower()
     if c in db.keys():
         del db[c]
         print 'After del:'
@@ -54,7 +59,7 @@ def deluser():
 def Getuserpwd():
     if db:    
         for name in db:
-            print 'name:',name,'pwd:',db[name][0]
+            print 'name:',name,',pwd:',db[name][0]
     else:
         print 'No user!'
 
