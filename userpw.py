@@ -2,15 +2,15 @@
 
 from time import time,ctime #导入模块
 import base64
-import string #导入string模块
+import string 
 db = {}
-y=string.letters+string.digits#限定只能是数字和大小写字母
+y=string.letters+string.digits
 
 def newuser():
-    prompt = 'login desired,only accept digits and letters: '
+    prompt = 'login desired,name only accept digits and letters: '
     while True:
         name = raw_input(prompt).strip()[0].lower()
-        if name in y:#验证
+        if name in y:
             if db.has_key(name):
                 prompt = 'name taken, try another: '
                 continue
@@ -34,16 +34,22 @@ def olduser():
             current=time()
             delta=current-db[name][1]
             if delta<=14400: #判断是否在4小时内
-                print 'You already logged in 4 hours period!'
-
+                print 'You already logged in 4 hours period!'                
             else:
                 logt=time()#获取当前时间 
                 db[name][1]=logt #把密码和时间组成列表存到字典，共享一个键
         else: 
             print 'login incorrect'  
 
-    else: 
-        print 'login incorrect'
+    else:#当输入的用户名和密码不是注册过的，打印提升信息：是否注册？
+        w=raw_input('register it(Y/N)?').strip()[0].lower()
+        if 'y' == w:
+            newuser()#若选择注册，调用新用户注册函数
+        else:
+            print 'login incorrect'
+
+def userlog():#userlog函数首先默认调用老用户登录函数
+    olduser()
 
 
 def deluser():
@@ -93,8 +99,7 @@ Enter choice: """
 
 def showmenu():
     prompt = """
-(N)ew User Login
-(E)xisting User Login
+(U)ser Login
 (M)anagement
 (Q)uit
 
@@ -110,14 +115,13 @@ Enter choice: """
                 choice = 'q'
             print '\nYou picked: [%s]' % choice
 
-            if choice not in 'neqm':
+            if choice not in 'uqm':
                 print 'invalid menu option, try again'
             else:
                 chosen = True
 
         if choice == 'q': done = 1
-        if choice == 'n': newuser()
-        if choice == 'e': olduser()
+        if choice == 'u': userlog()
         if choice == 'm': management()
 
 if __name__ == '__main__':
