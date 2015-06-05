@@ -1,29 +1,29 @@
 #!/usr/bin/env python
 
 from time import time,ctime #导入模块
-import base64#导入加密模块
+import base64
 db = {}
 
 def newuser():
     prompt = 'login desired: '
     while True:
-        name = raw_input(prompt)
+        name = raw_input(prompt).strip()[0].lower()#设定小写
         if db.has_key(name):
             prompt = 'name taken, try another: '
             continue
         else:
             break
-    p1 = raw_input('passwd: ')#明文密码
+    p1 = raw_input('passwd: ')
     logt=time()
-    p2 = base64.encodestring(p1)#密文密码
-    db[name]=[p2,logt]#存储密文密码
+    p2 = base64.encodestring(p1)
+    db[name]=[p2,logt]
 
 def olduser(): 
-    name=raw_input('login: ') 
+    name=raw_input('login: ').strip()[0].lower()#设定小写
     p1=raw_input('passwd: ')
     if name in db:
-        p2=base64.decodestring(db[name][0])#解密所存密文
-        if p1 == p2 : #与用户输入密码比对
+        p2=base64.decodestring(db[name][0])
+        if p1 == p2 : 
             print 'welcome back',name 
             print 'You lasttime logged in at:',ctime(db[name][1])
             current=time()
@@ -43,7 +43,7 @@ def olduser():
 
 def deluser():
     Getuserpwd()
-    c=raw_input('del a user,its name:')
+    c=raw_input('del a user,its name:').strip()[0].lower()#设定小写
     if c in db.keys():
         del db[c]
         print 'After del:'
