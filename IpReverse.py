@@ -1,5 +1,3 @@
-
-
 def tranFromIPToInt(strIP):
     lst = strIP.split(".")
     if len(lst) != 4:
